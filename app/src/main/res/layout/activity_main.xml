@@ -2,12 +2,21 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorAccent"
+    android:background="@color/color_cc"
     android:orientation="vertical">
 
-    <com.panner.paletteview.view.ColorPickerView
-        android:id="@+id/picker_view"
+    <Button
+        android:id="@+id/open_picker_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="wrap_content"
+        android:text="PickerView"
+        android:textAllCaps="false" />
+
+    <Button
+        android:id="@+id/open_rectangle_picker"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Rectangle_PickerView"
+        android:textAllCaps="false" />
 
 </LinearLayout>

@@ -10,4 +10,12 @@
         <!--取色盘的大小-->
         <attr name="picker_width" format="dimension" />
     </declare-styleable>
+    <!--矩形的去色盘-->
+    <declare-styleable name="RectanglePickerView">
+        <attr name="indicator_width_rect" format="dimension" />
+        <attr name="indicator_color_rect" format="color" />
+        <attr name="indicator_icon_rect" format="reference" />
+        <attr name="picker_height_rect" format="dimension" />
+        <attr name="picker_width_rect" format="dimension" />
+    </declare-styleable>
 </resources>

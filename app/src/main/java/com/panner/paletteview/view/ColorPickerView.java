@@ -22,6 +22,7 @@ import android.view.View;
 import android.view.ViewParent;
 
 import com.panner.paletteview.R;
+import com.panner.paletteview.listener.PickerViewListener;
 
 /**
  * 取色盘（RGB)
@@ -94,10 +95,10 @@ public class ColorPickerView extends View {
      */
     private void initAttr(AttributeSet attrs) {
         TypedArray typedArray = mContext.obtainStyledAttributes(attrs, R.styleable.ColorPickerView);
-        mTouchWidth = typedArray.getInt(R.styleable.ColorPickerView_indicator_width, 5);
+        mTouchWidth = typedArray.getInt(R.styleable.ColorPickerView_indicator_width, 20);
         mTouchColor = typedArray.getColor(R.styleable.ColorPickerView_indicator_color,
                 mContext.getResources().getColor(R.color.colorAccent));
-        mPickerViewWidth = typedArray.getInt(R.styleable.ColorPickerView_picker_width, 800);
+        mPickerViewWidth = typedArray.getInt(R.styleable.ColorPickerView_picker_width, 600);
         mTouchResId = typedArray.getResourceId(R.styleable.ColorPickerView_indicator_icon, 0);
 //        if(mTouchResId==0) {
 //            //未指定指示器的图标采用默认的绘制一个小圆形
@@ -116,7 +117,7 @@ public class ColorPickerView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         canvas.drawBitmap(mPickerView, mPickerViewRect.left, mPickerViewRect.top, null);
-        canvas.drawCircle(mTouchCircleX, mTouchCircleY, 30, mTouchViewPaint);
+        canvas.drawCircle(mTouchCircleX, mTouchCircleY, mTouchWidth, mTouchViewPaint);
     }
 
     @Override
@@ -135,6 +136,13 @@ public class ColorPickerView extends View {
 
     }
 
+    /**
+     * 创建背景图片
+     * 将圆度分为12份，每30度为一份，渐变渲染
+     * 将hsv转为rgb渲染图片，h->色彩  s->深浅，0-1之间的值，越小越白  v->明暗，图片的亮暗，0-1之间，越小越暗
+     *
+     * @return
+     */
     private Bitmap createPickerView() {
         Bitmap bitmap = Bitmap.createBitmap(mPickerViewWidth, mPickerViewWidth, Bitmap.Config.ARGB_8888);
         int colorCount = 12;
@@ -145,7 +153,6 @@ public class ColorPickerView extends View {
             hsv[0] = (i * colorAngleStep + 180) % 360;
             colors[i] = Color.HSVToColor(hsv);
         }
-
         SweepGradient sweepGradient = new SweepGradient(mCenterX, mCenterY, colors, null);
         RadialGradient radialGradient = new RadialGradient(mCenterX, mCenterY, mPickerViewWidth / 2,
                 0xFFFFFFFF, 0x00FFFFFF, Shader.TileMode.CLAMP);
@@ -176,7 +183,7 @@ public class ColorPickerView extends View {
                         if (mPickerViewListener != null) {
                             mTouchCircleY = y;
                             mTouchCircleX = x;
-                            mPickerViewListener.onColorPicker(getColor());
+                            mPickerViewListener.onPickerColor(getColor());
                             postInvalidate();
                         }
                     }
@@ -190,6 +197,11 @@ public class ColorPickerView extends View {
 
     }
 
+    /**
+     * 将选中位置的hsv转color
+     *
+     * @return
+     */
     public int getColor() {
         return Color.HSVToColor(mPickerHsv);
     }
@@ -197,10 +209,10 @@ public class ColorPickerView extends View {
     /**
      * 设置拖动圆的大小
      *
-     * @param touchWidth
+     * @param touchRadius
      */
-    public void setTouchWidth(int touchWidth) {
-        this.mTouchWidth = touchWidth;
+    public void setTouchRadius(int touchRadius) {
+        this.mTouchWidth = touchRadius;
     }
 
     /**
@@ -217,7 +229,7 @@ public class ColorPickerView extends View {
      *
      * @param radius
      */
-    public void setPickerViewWidth(int radius) {
+    public void setPickerRadius(int radius) {
         this.mPickerViewWidth = radius;
     }
 
@@ -225,9 +237,5 @@ public class ColorPickerView extends View {
 
     public void setOnColorPickListener(PickerViewListener listener) {
         this.mPickerViewListener = listener;
-    }
-
-    public interface PickerViewListener {
-        void onColorPicker(int color);
     }
 }
