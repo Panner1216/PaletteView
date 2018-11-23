@@ -17,6 +17,7 @@ import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewParent;
@@ -50,6 +51,7 @@ public class ColorPickerView extends View {
     private float[] mPickerHsv = {0f, 1f, 1f};
     private int mTouchCircleY;
     private int mTouchCircleX;
+    private Paint mBigTouchCircle;
 
     public ColorPickerView(Context context) {
         this(context, null);
@@ -84,8 +86,13 @@ public class ColorPickerView extends View {
         mTouchViewPaint = new Paint();
         mTouchViewPaint.setAntiAlias(true);
         mTouchViewPaint.setDither(true);
-        mTouchViewPaint.setStrokeWidth(5);//设置拖动圆的大小
+        mTouchViewPaint.setStrokeWidth(5);//设置拖动圆描边的大小
         mTouchViewPaint.setColor(Color.parseColor("#FFFFFFFF"));
+        //拖动圆的边框
+        mBigTouchCircle = new Paint();
+        mBigTouchCircle.setAntiAlias(true);
+        mBigTouchCircle.setDither(true);
+        mBigTouchCircle.setColor(getResources().getColor(R.color.color_ff));
     }
 
     /**
@@ -117,6 +124,7 @@ public class ColorPickerView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         canvas.drawBitmap(mPickerView, mPickerViewRect.left, mPickerViewRect.top, null);
+        canvas.drawCircle(mTouchCircleX,mTouchCircleY,mTouchWidth+2,mBigTouchCircle);
         canvas.drawCircle(mTouchCircleX, mTouchCircleY, mTouchWidth, mTouchViewPaint);
     }
 
@@ -176,14 +184,16 @@ public class ColorPickerView extends View {
                     int y = (int) event.getY();
                     int cx = x - mCenterX;
                     int cy = y - mCenterY;
-                    double d = Math.sqrt(cx * cx + cy * cy);
+                    double d = Math.sqrt(cx * cx + cy * cy);//计算手指到圆心的距离，直角三角形特性，直角边的平方和等于斜边的平方
+
                     if (d <= mPickerViewWidth / 2) {
-                        mPickerHsv[0] = (float) (Math.toDegrees(Math.atan2(cy, cx)) + 180f);
-                        mPickerHsv[1] = Math.max(0f, Math.min(1f, (float) (d / mPickerViewWidth / 2)));
+                        mPickerHsv[0] = (float) (Math.toDegrees(Math.atan2(cy, cx)) + 180f);//计算当前位置色彩H
+                        mPickerHsv[1] = Math.max(0f, Math.min(1f, (float) (d / (mPickerViewWidth / 2f))));//计算当前深浅S
                         if (mPickerViewListener != null) {
                             mTouchCircleY = y;
                             mTouchCircleX = x;
                             mPickerViewListener.onPickerColor(getColor());
+                            mTouchViewPaint.setColor(getColor());
                             postInvalidate();
                         }
                     }
