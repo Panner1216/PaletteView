@@ -1,6 +1,7 @@
 # PaletteView
 Android picker color view
-
+![Image text](https://raw.githubusercontent.com/pzhj1216/PaletteView/master/image/device-2018-11-26-115116.png)
+![Image text](https://raw.githubusercontent.com/pzhj1216/PaletteView/master/image/device-2018-11-26-115136.png)
 ## ColorPickerView
 ### 一个圆形的色盘
 
