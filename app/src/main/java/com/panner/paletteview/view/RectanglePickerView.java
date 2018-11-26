@@ -9,22 +9,19 @@ import android.graphics.ComposeShader;
 import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
-import android.graphics.Rect;
 import android.graphics.Shader;
 import android.os.Build;
 import android.support.annotation.ColorInt;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.util.AttributeSet;
-import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewParent;
-import android.view.WindowManager;
 
 import com.panner.paletteview.R;
 import com.panner.paletteview.listener.PickerViewListener;
+import com.panner.paletteview.utils.AppUtils;
 
 /**
  * @author panzhijie
@@ -35,16 +32,18 @@ public class RectanglePickerView extends View {
 
     private Paint mPickerPaint;//背景图片画笔
     private Paint mTouchViewPaint;
-    private int mTouchViewRadius;
+    private float mTouchViewRadius;
     private int mTouchViewColor;
 
-    private int mPickerViewWidth, mPickerViewHeight;//去色盘的宽高
+    private float mPickerViewWidth;
+    private int mPickerViewHeight;//去色盘的宽高
     private Bitmap mPickerView;
     private int mCenterX;
     private int mCenterY;
     private float[] mPickerHsv = {0f, 1f, 1f};
     private int mTouchCircleY;
     private int mTouchCircleX;
+    private Paint mBigTouchCircle;
 
     public RectanglePickerView(Context context) {
         this(context, null);
@@ -80,21 +79,13 @@ public class RectanglePickerView extends View {
         mTouchViewPaint.setDither(true);
         mTouchViewPaint.setStrokeWidth(5);
         mTouchViewPaint.setColor(mTouchViewColor);
+        //拖动圆的边框
+        mBigTouchCircle = new Paint();
+        mBigTouchCircle.setAntiAlias(true);
+        mBigTouchCircle.setDither(true);
+        mBigTouchCircle.setColor(getResources().getColor(R.color.color_cc));
     }
 
-    /**
-     * 获取屏幕宽度
-     *
-     * @param context
-     * @return
-     */
-    @NonNull
-    public static int getScreenWidth(Context context) {
-        WindowManager service = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-        DisplayMetrics displayMetrics = new DisplayMetrics();
-        service.getDefaultDisplay().getMetrics(displayMetrics);
-        return displayMetrics.widthPixels;
-    }
 
     /**
      * 初始化属性值
@@ -104,24 +95,71 @@ public class RectanglePickerView extends View {
      */
     public void initAttrs(Context context, AttributeSet attrs) {
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.RectanglePickerView);
-        mTouchViewRadius = typedArray.getInt(R.styleable.RectanglePickerView_indicator_width_rect, 20);
+        mTouchViewRadius = typedArray.getDimension(R.styleable.RectanglePickerView_indicator_width_rect, 25);
         mTouchViewColor = typedArray.getColor(R.styleable.RectanglePickerView_indicator_color_rect,
                 context.getResources().getColor(R.color.color_ff));
-        mPickerViewWidth = typedArray.getInt(R.styleable.RectanglePickerView_picker_width_rect, getScreenWidth(context));
-        mPickerViewHeight = typedArray.getInt(R.styleable.RectanglePickerView_picker_height_rect, 300);
+        mPickerViewWidth = typedArray.getDimension(R.styleable.RectanglePickerView_picker_width_rect, AppUtils.getScreenWidth(context));
+        mPickerViewHeight = (int) typedArray.getDimension(R.styleable.RectanglePickerView_picker_height_rect, 600);
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         canvas.drawBitmap(mPickerView, 0, 0, null);
+        canvas.drawCircle(mTouchCircleX, mTouchCircleY, mTouchViewRadius + 4, mBigTouchCircle);
         canvas.drawCircle(mTouchCircleX, mTouchCircleY, mTouchViewRadius, mTouchViewPaint);
+    }
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        final int minimumWidth = getSuggestedMinimumWidth();
+        final int minimumHeight = getSuggestedMinimumHeight();
+        int width = measureWidth(minimumWidth, widthMeasureSpec);
+        int height = measureHeight(minimumHeight, heightMeasureSpec);
+        setMeasuredDimension(width, height);
+    }
+
+    private int measureWidth(int defaultWidth, int measureSpec) {
+
+        int specMode = MeasureSpec.getMode(measureSpec);
+        int specSize = MeasureSpec.getSize(measureSpec);
+        switch (specMode) {
+            case MeasureSpec.AT_MOST:
+                defaultWidth = (int) (mPickerViewWidth + getPaddingLeft() + getPaddingRight());
+                break;
+            case MeasureSpec.EXACTLY:
+                defaultWidth = specSize;
+                break;
+            case MeasureSpec.UNSPECIFIED:
+                defaultWidth = Math.max(defaultWidth, specSize);
+        }
+        return defaultWidth;
+    }
+
+    private int measureHeight(int defaultHeight, int measureSpec) {
+
+        int specMode = MeasureSpec.getMode(measureSpec);
+        int specSize = MeasureSpec.getSize(measureSpec);
+
+        switch (specMode) {
+            case MeasureSpec.AT_MOST:
+                defaultHeight = mPickerViewHeight + getPaddingTop() + getPaddingBottom();
+                break;
+            case MeasureSpec.EXACTLY:
+                defaultHeight = specSize;
+                break;
+            case MeasureSpec.UNSPECIFIED:
+                defaultHeight = Math.max(defaultHeight, specSize);
+                break;
+        }
+        return defaultHeight;
     }
 
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-        mCenterX = mTouchCircleX = mPickerViewWidth / 2;
+        mCenterX = mTouchCircleX = (int) (mPickerViewWidth / 2);
         mCenterY = mTouchCircleY = mPickerViewHeight / 2;
         mPickerView = createPickerViewBitmap();
     }
@@ -138,16 +176,16 @@ public class RectanglePickerView extends View {
                     int x = (int) event.getX();
                     int y = (int) event.getY();
                     int cx = x - mCenterX;
-                    int cy = y - mCenterY;
-                    double d = Math.sqrt(cx * cx + cy * cy);
-                    if (d <= mPickerViewWidth / 2) {
-                        mPickerHsv[0] = (float) (Math.toDegrees(Math.atan2(cy, cx)) + 180f);
-                        mPickerHsv[1] = Math.max(0f, Math.min(1f, (float) (d / mPickerViewWidth / 2)));
+
+                    if (cx <= mPickerViewWidth && y <= mPickerViewHeight) {
+                        mPickerHsv[0] = 360f - 360f / mPickerViewWidth * x;
+                        mPickerHsv[1] = y / (float) mPickerViewHeight;
+
                         if (mPickerViewListener != null) {
                             mTouchCircleY = y;
                             mTouchCircleX = x;
                             mPickerViewListener.onPickerColor(getColor());
-                            mTouchViewColor=getColor();
+                            mTouchViewColor = getColor();
                             mTouchViewPaint.setColor(mTouchViewColor);
                             postInvalidate();
                         }
@@ -190,7 +228,7 @@ public class RectanglePickerView extends View {
      * @return
      */
     public Bitmap createPickerViewBitmap() {
-        Bitmap bitmap = Bitmap.createBitmap(mPickerViewWidth, mPickerViewHeight, Bitmap.Config.ARGB_8888);
+        Bitmap bitmap = Bitmap.createBitmap((int) mPickerViewWidth, mPickerViewHeight, Bitmap.Config.ARGB_8888);
         int colorCount = 6;
         int colorAngleStep = 360 / 6;
         int colors[] = new int[colorCount + 1];

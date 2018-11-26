@@ -3,7 +3,6 @@ package com.panner.paletteview.view;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.ComposeShader;
@@ -17,13 +16,13 @@ import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewParent;
 
 import com.panner.paletteview.R;
 import com.panner.paletteview.listener.PickerViewListener;
+import com.panner.paletteview.utils.AppUtils;
 
 /**
  * 取色盘（RGB)
@@ -102,10 +101,10 @@ public class ColorPickerView extends View {
      */
     private void initAttr(AttributeSet attrs) {
         TypedArray typedArray = mContext.obtainStyledAttributes(attrs, R.styleable.ColorPickerView);
-        mTouchWidth = typedArray.getInt(R.styleable.ColorPickerView_indicator_width, 20);
+        mTouchWidth = (int) typedArray.getDimension(R.styleable.ColorPickerView_indicator_width, 25);
         mTouchColor = typedArray.getColor(R.styleable.ColorPickerView_indicator_color,
                 mContext.getResources().getColor(R.color.colorAccent));
-        mPickerViewWidth = typedArray.getInt(R.styleable.ColorPickerView_picker_width, 600);
+        mPickerViewWidth = (int) typedArray.getDimension(R.styleable.ColorPickerView_picker_width, AppUtils.getScreenWidth(mContext));
         mTouchResId = typedArray.getResourceId(R.styleable.ColorPickerView_indicator_icon, 0);
 //        if(mTouchResId==0) {
 //            //未指定指示器的图标采用默认的绘制一个小圆形
@@ -124,7 +123,7 @@ public class ColorPickerView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         canvas.drawBitmap(mPickerView, mPickerViewRect.left, mPickerViewRect.top, null);
-        canvas.drawCircle(mTouchCircleX,mTouchCircleY,mTouchWidth+2,mBigTouchCircle);
+        canvas.drawCircle(mTouchCircleX, mTouchCircleY, mTouchWidth + 4, mBigTouchCircle);
         canvas.drawCircle(mTouchCircleX, mTouchCircleY, mTouchWidth, mTouchViewPaint);
     }
 
