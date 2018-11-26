@@ -1,5 +1,6 @@
 # PaletteView
-Android picker color view
+### Android picker color view
+
 ![Image text](https://raw.githubusercontent.com/pzhj1216/PaletteView/master/image/_20181126120019.png)
 ![Image text](https://raw.githubusercontent.com/pzhj1216/PaletteView/master/image/_20181126120015.png)
 ## ColorPickerView
