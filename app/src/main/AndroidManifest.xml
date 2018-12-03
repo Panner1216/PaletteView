@@ -17,7 +17,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".ui.RectanglePickerActivity" />
-        <activity android:name=".ui.PickerViewActivity"></activity>
+        <activity android:name=".ui.PickerViewActivity" />
+        <activity android:name=".ui.DoubleColorPickerActivity"></activity>
     </application>
 
 </manifest>

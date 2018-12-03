@@ -2,14 +2,10 @@ package com.panner.paletteview.view;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.ComposeShader;
 import android.graphics.LinearGradient;
 import android.graphics.Paint;
-import android.graphics.PorterDuff;
-import android.graphics.Shader;
 import android.os.Build;
 import android.support.annotation.ColorInt;
 import android.support.annotation.Nullable;
@@ -28,7 +24,7 @@ import com.panner.paletteview.utils.AppUtils;
  * @version 2018-11-23-09:43
  */
 
-public class RectanglePickerView extends View {
+public class DoubleColorPickerView extends View {
 
     private Paint mPickerPaint;//背景图片画笔
     private Paint mTouchViewPaint;
@@ -36,31 +32,28 @@ public class RectanglePickerView extends View {
     private int mTouchViewColor;
 
     private int mPickerViewWidth;
-    private int mPickerViewHeight;//去色盘的宽高
-    private Bitmap mPickerView;
-    private int mCenterX;
-    private int mCenterY;
-    private float[] mPickerHsv = {0f, 1f, 1f};
+    private int mPickerViewHeight;//取色盘的宽高
     private int mTouchCircleY;
     private int mTouchCircleX;
     private Paint mBigTouchCircle;
+    private int mStartColor = 0xFFFAAC24, mEndColor = 0XFFFFFFFF;
 
-    public RectanglePickerView(Context context) {
+    public DoubleColorPickerView(Context context) {
         this(context, null);
     }
 
-    public RectanglePickerView(Context context, @Nullable AttributeSet attrs) {
+    public DoubleColorPickerView(Context context, @Nullable AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public RectanglePickerView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public DoubleColorPickerView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         initAttrs(context, attrs);
         init();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    public RectanglePickerView(Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+    public DoubleColorPickerView(Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
         init();
     }
@@ -102,10 +95,17 @@ public class RectanglePickerView extends View {
         mPickerViewHeight = (int) typedArray.getDimension(R.styleable.RectanglePickerView_picker_height_rect, 600);
     }
 
+    /**
+     * 画色盘的时候传入的颜色数组为想要的两种变化颜色
+     *
+     * @param canvas
+     */
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        canvas.drawBitmap(mPickerView, 0, 0, null);
+        LinearGradient linearGradient = new LinearGradient(0, 0, mPickerViewWidth, 0, new int[]{mStartColor, mEndColor}, null, LinearGradient.TileMode.CLAMP);
+        mPickerPaint.setShader(linearGradient);
+        canvas.drawRect(0, 0, mPickerViewWidth, mPickerViewHeight, mPickerPaint);
         canvas.drawCircle(mTouchCircleX, mTouchCircleY, mTouchViewRadius + 4, mBigTouchCircle);
         canvas.drawCircle(mTouchCircleX, mTouchCircleY, mTouchViewRadius, mTouchViewPaint);
     }
@@ -159,9 +159,8 @@ public class RectanglePickerView extends View {
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-        mCenterX = mTouchCircleX = (int) (mPickerViewWidth / 2);
-        mCenterY = mTouchCircleY = mPickerViewHeight / 2;
-        mPickerView = createPickerViewBitmap();
+        mTouchCircleX = mPickerViewWidth / 2;
+        mTouchCircleY = mPickerViewHeight / 2;
     }
 
     @Override
@@ -175,6 +174,7 @@ public class RectanglePickerView extends View {
                 case MotionEvent.ACTION_MOVE:
                     int x = (int) event.getX();
                     int y = (int) event.getY();
+                    //处理越界问题
                     if (y > mPickerViewHeight) {
                         y = mPickerViewHeight;
                     }
@@ -182,8 +182,6 @@ public class RectanglePickerView extends View {
                         x = mPickerViewWidth;
                     }
                     if (x <= mPickerViewWidth && y <= mPickerViewHeight && x >= 0 && y >= 0) {
-                        mPickerHsv[0] = 360f - 360f / mPickerViewWidth * x;
-                        mPickerHsv[1] = y / (float) mPickerViewHeight;
 
                         if (mPickerViewListener != null) {
                             mTouchCircleY = y;
@@ -216,40 +214,32 @@ public class RectanglePickerView extends View {
     }
 
     /**
+     * 渐变开始的颜色值
+     *
+     * @param color 传入十六进制的颜色值如0X000000
+     */
+    public void setStartColor(int color) {
+        this.mStartColor = color;
+
+    }
+
+    /**
+     * 渐变结束的颜色值
+     *
+     * @param color 传入十六进制的颜色值如0XFFFFFF
+     */
+    public void setEndColor(int color) {
+        this.mEndColor = color;
+
+    }
+
+    /**
      * 将hsv转换为color
      *
      * @return
      */
     public int getColor() {
-        return Color.HSVToColor(mPickerHsv);
-    }
-
-    /**
-     * 创建背景图片
-     * 将宽度分为13份，每30度为一份，渐变渲染
-     * 将hsv转为rgb渲染图片，h->色彩  s->深浅，0-1之间的值，越小越白  v->明暗，图片的亮暗，0-1之间，越小越暗
-     *
-     * @return
-     */
-    public Bitmap createPickerViewBitmap() {
-        Bitmap bitmap = Bitmap.createBitmap((int) mPickerViewWidth, mPickerViewHeight, Bitmap.Config.ARGB_8888);
-        int colorCount = 6;
-        int colorAngleStep = 360 / 6;
-        int colors[] = new int[colorCount + 1];
-        float hsv[] = new float[]{0f, 1f, 1f};
-        for (int i = 0; i < colors.length; i++) {
-            hsv[0] = 360 - (i * colorAngleStep) % 360;
-            colors[i] = Color.HSVToColor(hsv);
-        }
-        LinearGradient linearGradient = new LinearGradient(0, 0, mPickerViewWidth, 0,
-                colors, null, Shader.TileMode.CLAMP);
-        LinearGradient gradient = new LinearGradient(0, 0, 0, mPickerViewHeight,
-                new int[]{Color.WHITE, Color.TRANSPARENT}, null, Shader.TileMode.CLAMP);
-        ComposeShader composeShader = new ComposeShader(linearGradient, gradient, PorterDuff.Mode.SRC_OVER);
-        mPickerPaint.setShader(composeShader);
-        Canvas canvas = new Canvas(bitmap);
-        canvas.drawRect(0, 0, mPickerViewWidth, mPickerViewHeight, mPickerPaint);
-        return bitmap;
+        return Color.parseColor("#FFFF" + addZeroForNumLeft(Integer.toHexString((int) (mTouchCircleX * (255f / mPickerViewWidth))), 2));
     }
 
     /**
@@ -286,5 +276,26 @@ public class RectanglePickerView extends View {
      */
     public void setTouchViewRadius(int radius) {
         this.mTouchViewRadius = radius;
+    }
+
+    /**
+     * 将传入的字符串转换为指定位数，不足的左补零
+     *
+     * @param str
+     * @param strLength
+     * @return
+     */
+    public static String addZeroForNumLeft(String str, int strLength) {
+        int strLen = str.length();
+        if (strLen < strLength) {
+            while (strLen < strLength) {
+                StringBuffer sb = new StringBuffer();
+                sb.append("0").append(str);// 左补0
+                str = sb.toString();
+                strLen = str.length();
+            }
+        }
+
+        return str;
     }
 }

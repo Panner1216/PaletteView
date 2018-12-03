@@ -18,5 +18,11 @@
         android:layout_height="wrap_content"
         android:text="Rectangle_PickerView"
         android:textAllCaps="false" />
+    <Button
+        android:id="@+id/open_double_color_picker"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Double_color_picker"
+        android:textAllCaps="false"/>
 
 </LinearLayout>

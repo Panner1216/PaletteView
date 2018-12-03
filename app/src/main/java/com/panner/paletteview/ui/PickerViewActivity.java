@@ -7,6 +7,7 @@ import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.panner.paletteview.R;
 import com.panner.paletteview.listener.PickerViewListener;
@@ -17,7 +18,7 @@ import butterknife.ButterKnife;
 
 public class PickerViewActivity extends AppCompatActivity {
     @BindView(R.id.color_value)
-    Button mColorValue;
+    TextView mColorValue;
     @BindView(R.id.picker_view)
     ColorPickerView mPickerView;
 

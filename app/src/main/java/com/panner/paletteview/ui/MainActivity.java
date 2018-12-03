@@ -28,4 +28,9 @@ public class MainActivity extends AppCompatActivity {
     void openRectangleView() {
         startActivity(new Intent(this, RectanglePickerActivity.class));
     }
+
+    @OnClick(R.id.open_double_color_picker)
+    void openDoubleColorPicker() {
+        startActivity(new Intent(this, DoubleColorPickerActivity.class));
+    }
 }
