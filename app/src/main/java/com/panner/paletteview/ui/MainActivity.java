@@ -33,4 +33,8 @@ public class MainActivity extends AppCompatActivity {
     void openDoubleColorPicker() {
         startActivity(new Intent(this, DoubleColorPickerActivity.class));
     }
+    @OnClick(R.id.open_item)
+    void openItem(){
+        startActivity(new Intent(this, RecyclerViewItemActivity.class));
+    }
 }

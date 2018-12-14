@@ -25,7 +25,7 @@ import com.panner.paletteview.listener.PickerViewListener;
 import com.panner.paletteview.utils.AppUtils;
 
 /**
- * 取色盘（RGB)
+ * 取色盘（rgb)
  *
  * @author panzhijie
  * @version 2018-11-7 11:00

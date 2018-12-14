@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <com.panner.paletteview.view.RecyclerViewItem
+        android:id="@+id/view"
+        android:layout_width="100dp"
+        android:layout_height="100dp" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/color_cc" />
+
+    <com.panner.paletteview.view.RecyclerViewItem
+        android:id="@+id/view1"
+        android:layout_width="100dp"
+        android:layout_height="100dp" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/color_cc" />
+
+    <com.panner.paletteview.view.RecyclerViewItem
+        android:id="@+id/view2"
+        android:layout_width="100dp"
+        android:layout_height="100dp" />
+</LinearLayout>

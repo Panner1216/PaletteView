@@ -20,7 +20,7 @@ public class RectanglePickerActivity extends AppCompatActivity {
         mPickerView.setOnColorPickerListener(new PickerViewListener() {
             @Override
             public void onPickerColor(int color) {
-
+                ((View)mPickerView.getParent()).setBackgroundColor(color);
             }
         });
 

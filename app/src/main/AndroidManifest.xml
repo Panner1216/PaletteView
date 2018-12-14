@@ -19,6 +19,8 @@
         <activity android:name=".ui.RectanglePickerActivity" />
         <activity android:name=".ui.PickerViewActivity" />
         <activity android:name=".ui.DoubleColorPickerActivity"></activity>
+        <activity android:name=".ui.PickerViewActivity" />
+        <activity android:name=".ui.RecyclerViewItemActivity"></activity>
     </application>
 
 </manifest>
