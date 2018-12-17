@@ -13,7 +13,7 @@
 ## DoubleColorPickerView
 ### 一个黄白渐变的色盘
 ## RecyclerViewItem
-![Image text](https://github.com/pzhj1216/PaletteView/blob/master/image/device-2018-12-17-102026.png)
+![Image text](https://github.com/pzhj1216/PaletteView/blob/master/image/1545013421(1).png)
 ### xml中
     picker_width_rect：色盘宽度
     picker_height_rect：色盘高度
