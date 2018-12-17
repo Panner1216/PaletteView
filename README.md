@@ -9,6 +9,11 @@
 ## RectanglePickerView
 ### 一个矩形的色盘
     可以设置色盘的宽、高，拖拽圆的半径、颜色等
+    
+## DoubleColorPickerView
+### 一个黄白渐变的色盘
+## RecyclerViewItem
+![Image text](https://raw.githubusercontent.com/pzhj1216/PaletteView/master/image/_20181126120015.png)
 ### xml中
     picker_width_rect：色盘宽度
     picker_height_rect：色盘高度
