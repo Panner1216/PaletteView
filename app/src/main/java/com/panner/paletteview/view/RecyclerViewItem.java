@@ -88,9 +88,9 @@ public class RecyclerViewItem extends View {
             } else if (mBitmaps.size() <= 4) {
                 Rect src;
                 if (i > 1) {
-                    src = new Rect(mBitmaps.get(i).getWidth() / 2 * (i - 2) + dp2px(mContext, 10), mBitmaps.get(i).getHeight() + dp2px(mContext, 10),
+                    src = new Rect(mBitmaps.get(i).getWidth()* (i - 2) + dp2px(mContext, 10), mBitmaps.get(i).getHeight() + dp2px(mContext, 10),
                             mBitmaps.get(i).getWidth() * (i - 1) + dp2px(mContext, 10), mBitmaps.get(i).getHeight() * 2 + dp2px(mContext, 10));
-                    canvas.drawCircle(mBitmaps.get(i).getWidth() / 2 * (i - 2) + dp2px(mContext, 10) + mBitmaps.get(i).getWidth() / 2,
+                    canvas.drawCircle(mBitmaps.get(i).getWidth()  * (i - 2) + dp2px(mContext, 10) + mBitmaps.get(i).getWidth() / 2,
                             mBitmaps.get(i).getHeight() + dp2px(mContext, 10) + mBitmaps.get(i).getHeight() / 2,
                             mBitmaps.get(i).getHeight() / 2 - dp2px(mContext, 2), mWhiteBg);
                 } else {

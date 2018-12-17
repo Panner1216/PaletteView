@@ -38,6 +38,7 @@ public class RecyclerViewItemActivity extends AppCompatActivity {
             add("rgb");
             add("single");
             add("single");
+            add("single");
         }};
         mView1.setBitmaps(strings1);
         ArrayList<String> strings2 = new ArrayList<String>() {{
